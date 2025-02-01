@@ -112,7 +112,7 @@ f(t - \mu) &= \frac{1}{2\pi} \int_{-\infty}^\infty \mathrm{e}^{-\frac{1}{2} \sig
 ```
 
 ```math
-\Phi \left ( \frac{t-\mu}{\sigma} \right ) \approx \frac{2}{T} \left (\frac{t-\mu}{2} + \sum_{n\,=\,1}^{n_\mathrm{max}} \frac{T}{2\pi n}\mathrm{e}^{-\frac{1}{2} \sigma^2(2\pi \frac{n}{T})^2} \sin\left(2\pi \frac{n}{T} (t-\mu)\right) \right ) + \frac{1}{2}
+\Phi \left ( \frac{t-\mu}{\sigma} \right ) \approx \frac{2}{T} \left (\frac{t-\mu}{2\sigma} + \sum_{n\,=\,1}^{n_\mathrm{max}} \frac{T}{2\pi n}\mathrm{e}^{-\frac{1}{2} (2\pi \frac{n}{T})^2} \sin\left(2\pi \frac{n}{T\sigma} (t-\mu)\right) \right ) + \frac{1}{2}
 ```
 
 ```math
@@ -123,6 +123,6 @@ f(t - \mu) &= \frac{1}{2\pi} \int_{-\infty}^\infty \mathrm{e}^{-\frac{1}{2} \sig
 \begin{aligned}
 \mathrm{erf} \left ( \frac{t-\mu}{\sigma \sqrt{2}} \right ) &= 2 \Phi \left ( \frac{t-\mu}{\sigma} \right ) - 1 \\
 
-&\approx \frac{4}{T} \left (\frac{t-\mu}{2} + \sum_{n\,=\,1}^{n_\mathrm{max}} \frac{T}{2\pi n}\mathrm{e}^{-\frac{1}{2} \sigma^2(2\pi \frac{n}{T})^2} \sin\left(2\pi \frac{n}{T} (t-\mu)\right) \right )
+&\approx \frac{4}{T} \left (\frac{t-\mu}{2\sigma} + \sum_{n\,=\,1}^{n_\mathrm{max}} \frac{T}{2\pi n}\mathrm{e}^{-\frac{1}{2} (2\pi \frac{n}{T})^2} \sin\left(2\pi \frac{n}{T\sigma} (t-\mu)\right) \right )
 \end{aligned}
 ```
