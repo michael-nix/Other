@@ -113,18 +113,29 @@ f(t) &= \frac{1}{2\pi} \int_{-\infty}^\infty \mathrm{e}^{-\frac{1}{2} \sigma^2\o
 \end{aligned}
 ```
 
-
+If we then convert this into a Fourier _series_, it will then become:
 
 ```math
 f(t) \approx \frac{1}{T} \sum_{n\,=\,-\infty}^{\infty} \mathrm{e}^{-\frac{1}{2} \sigma^2(2\pi \frac{n}{T})^2} \cos\left(2\pi \frac{n}{T} t\right)
 ```
+
+Which looks like this, when dealing with $\mathcal{N}(0, 0.25)$:
+
+<p align="center">
+    <img src="./figures/periodic gaussian.png"><br>
+    <i>Figure 1: Periodic Gaussian by Fourier Series Approximation</i>
+</p>
+
+And I hope you notice that--much like every Fourier series transform--this is a periodic approximation.  That is, the Gaussian we have here is repeated for every interval, $T$.  
+
+But this isn't what we set out to do.  We wanted to create a bad version of a perfectly well approximated function, the error function.
 
 ```math
 -\frac{T}{2} \le t \le \frac{T}{2}
 ```
 
 ```math
-T = k\,\sigma
+T = 2k\,\sigma
 ```
 
 ```math
