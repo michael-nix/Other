@@ -128,7 +128,11 @@ Which looks like this, when dealing with $\mathcal{N}(0, 0.25)$:
 
 And I hope you notice that--much like every Fourier series transform--this is a periodic approximation.  That is, the Gaussian we have here is repeated for every interval, $T$.  
 
-But this isn't what we set out to do.  We wanted to create a bad version of a perfectly well approximated function, the error function.
+But this isn't what we set out to do.  We wanted to create a bad version of a perfectly well approximated function, the error function.  In order to get us closer to our true goal, we have to do two things:
+
+1. Correct it so that it's no longer periodic,
+2. Integrate it to get a cumulative distribution function,
+3. Translate that to an error function.
 
 ```math
 -\frac{T}{2} \le t \le \frac{T}{2}
