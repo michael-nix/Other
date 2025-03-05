@@ -1,4 +1,59 @@
-function v = badcdf(x, n, s, T)
+function v = badcdf(varargin)
+% function v = badcdf(x, n, s, T)
+
+switch nargin
+    case 0
+        % [u, x] = badgauss
+        n = 10;
+        x = -2*pi:0.01:2*pi;
+        s = 0.5;
+        T = 2 * 5 * s;
+        
+    case 1
+        % [u, x] = badgauss(n)
+        if length(varargin{1}) > 1
+            error('badgauss:InvalidInput','With one input, it must be the number of harmonics to use, n.');
+        end
+        
+        n = varargin{1};
+        x = -2*pi:0.01:2*pi;
+        s = 0.5;
+        T = 2 * 5 * s;
+        
+    case 2
+        % [u, x] = badgauss(x, n)
+        x = varargin{1};
+        
+        if length(varargin{2}) > 1
+            error('badgauss:InvalidInput','Input variable n is the number of harmonics and must be a single integer.');
+        end
+        n = varargin{2};
+        s = 0.5;
+        T = 2 * 5 * s;
+        
+    case 3
+        % [u, x] = badgauss(x, n, s)
+        x = varargin{1};
+        
+        if length(varargin{2}) > 1 || length(varargin{3}) > 1
+            error('badgauss:InvalidInput','Other than x, input variables must be single numbers.');
+        end
+        n = varargin{2};
+        s = varargin{3};
+        T = 2 * 5 * s;
+        
+    case 4
+        % [u, x] = badgauss(x, n, s, T)
+        x = varargin{1};
+        
+        if length(varargin{2}) > 1 || length(varargin{3}) > 1 || length(varargin{4}) > 1 
+            error('badgauss:InvalidInput','Other than x, input variables must be single numbers.');
+        end
+        n = varargin{2};
+        s = varargin{3};
+        T = varargin{4};
+end
+
     w = 2 * pi / T;
     v = exp(-(s * w).^2 / 2) .* sin(w.*x) ./ (w);
     for i = 2:n
@@ -10,3 +65,18 @@ function v = badcdf(x, n, s, T)
     % n = (1:n)';
     % w = 2*pi*n/T;
     % v = 2/T*(x/2 + sum(exp(-(s*w).^2/2).*sin(w.*x)./w, 1)) + 1/2;
+
+    switch nargout
+        case 0
+            fig = figure("OuterPosition", [200, 200, 800, 600]);
+            ax = gca(fig);
+            plot(ax, x, v, 'LineWidth', 1.5);
+            grid on;
+            axis([min(x), max(x), -0.1, 1.1]);
+            legend('"CDF"');
+            title("Gaussian Cumulative Density Function Approximation");
+            xlabel("input parameter (a.u.)");
+            ylabel("probability");
+    
+            v = [];
+    end

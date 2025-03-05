@@ -56,4 +56,22 @@ end
 
 w = 2*pi*n/T;
 u = 2/T*(1/2 + sum(exp(-(s*w).^2/2).*cos(w.*x), 1));
-v = 2/T*(x/2 + sum(exp(-(s*w).^2/2).*sin(w.*x)./w, 1)) + 1/2;
+
+if nargout == 3
+    v = 2/T*(x/2 + sum(exp(-(s*w).^2/2).*sin(w.*x)./w, 1)) + 1/2;
+end
+
+switch nargout
+    case 0
+        fig = figure("OuterPosition", [200, 200, 800, 600]);
+        ax = gca(fig);
+        plot(ax, x, u, 'LineWidth', 1.5);
+        grid on;
+        axis([min(x), max(x), 0, max(u) * 1.1]);
+        legend('"PDF"');
+        title("Gaussian Probability Density Function Approximation");
+        xlabel("input parameter (a.u.)");
+        ylabel("probability density")
+
+        u = [];
+end
