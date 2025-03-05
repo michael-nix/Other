@@ -28,7 +28,7 @@ switch nargout
         legend('"sine"');
         title("Polynomial Sine Function Approximation");
         xlabel("input parameter (a.u.)");
-        ylabel("cosine")
+        ylabel("sine")
 
         u = [];
 end
