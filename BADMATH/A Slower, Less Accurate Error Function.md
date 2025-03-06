@@ -122,7 +122,7 @@ f(t) \approx \frac{1}{T} \sum_{n\,=\,-\infty}^{\infty} \mathrm{e}^{-\frac{1}{2} 
 Which looks like this, when dealing with $\mathcal{N}(0, 0.25)$:
 
 <p align="center">
-    <img src="./figures/periodic gaussian.png"><br>
+    <img src="./figures/periodic gaussian.png" width="75%"><br>
     <i>Figure 1: Periodic Gaussian by Fourier Series Approximation</i>
 </p>
 
@@ -134,15 +134,19 @@ But this isn't what we set out to do.  We wanted to create a bad version of a pe
 2. Integrate it to get a cumulative distribution function,
 3. Translate that to an error function.
 
-
+The first thing we have to do is get rid of that periodicity.  Which is very easy when using a computer: just ignore it!  That is, if we limit the domain of our function to be within $\pm T / 2$, where $T$ is the period of our approximation, i.e.:
 
 ```math
 -\frac{T}{2} \le t \le \frac{T}{2}
 ```
 
+Then all we have to do is choose a suitable period.  Say we want some kind of use for this out to five standard deviations, then all we have to do in order to make sure we get both sides of the function working, is to double it:
+
 ```math
 T = 2k\,\sigma
 ```
+
+And in this way we make sure that we have $k$ standard deviations on either side of our function.
 
 ```math
 f(t) \approx \frac{2}{T} \left (\frac{1}{2} + \sum_{n\,=\,1}^{n_\mathrm{max}} \mathrm{e}^{-\frac{1}{2} \sigma^2(2\pi \frac{n}{T})^2} \cos\left(2\pi \frac{n}{T} t\right) \right )
@@ -156,7 +160,7 @@ f(t) \approx \frac{2}{T} \left (\frac{1}{2} + \sum_{n\,=\,1}^{n_\mathrm{max}} \m
 \Phi(t) \approx \frac{2}{T} \left (\frac{t}{2} + \sum_{n\,=\,1}^{n_\mathrm{max}} \frac{T}{2\pi n}\mathrm{e}^{-\frac{1}{2} \sigma^2(2\pi \frac{n}{T})^2} \sin\left(2\pi \frac{n}{T} t\right) \right ) + \frac{1}{2}
 ```
 
-```math
+<!-- ```math
 \begin{aligned}
 f(t - \mu) &= \frac{1}{2\pi} \int_{-\infty}^\infty \mathrm{e}^{-\frac{1}{2} \sigma^2\omega^2} \mathrm{e}^{-j\omega \mu} \mathrm{e}^{j\omega t} \; \mathrm{d}\omega \\
 
@@ -164,7 +168,7 @@ f(t - \mu) &= \frac{1}{2\pi} \int_{-\infty}^\infty \mathrm{e}^{-\frac{1}{2} \sig
 
 &= \int_{-\infty}^\infty \mathrm{e}^{-\frac{1}{2} \sigma^2(2\pi f)^2} \cos(2\pi f (t-\mu)) \; \mathrm{d}f
 \end{aligned}
-```
+``` -->
 
 ```math
 \Phi \left ( \frac{t-\mu}{\sigma} \right ) \approx \frac{2}{T} \left (\frac{t-\mu}{2\sigma} + \sum_{n\,=\,1}^{n_\mathrm{max}} \frac{T}{2\pi n}\mathrm{e}^{-\frac{1}{2} (2\pi \frac{n}{T})^2} \sin\left(2\pi \frac{n}{T\sigma} (t-\mu)\right) \right ) + \frac{1}{2}
@@ -174,10 +178,14 @@ f(t - \mu) &= \frac{1}{2\pi} \int_{-\infty}^\infty \mathrm{e}^{-\frac{1}{2} \sig
 \Phi \left ( \frac{t-\mu}{\sigma} \right ) = \frac{1}{2} \left [1 + \mathrm{erf} \left ( \frac{t-\mu}{\sigma \sqrt{2}} \right ) \right ]
 ```
 
+<p align="center">
+    <img src="./figures/cdf comparison.png" width="75%"><br>
+    <i>Figure 2: Comparison of Gaussian CDF and Approximation</i>
+</p>
+
 ```math
 \begin{aligned}
 \mathrm{erf} \left ( \frac{t-\mu}{\sigma \sqrt{2}} \right ) &= 2 \Phi \left ( \frac{t-\mu}{\sigma} \right ) - 1 \\
-
 &\approx \frac{4}{T} \left (\frac{t-\mu}{2\sigma} + \sum_{n\,=\,1}^{n_\mathrm{max}} \frac{T}{2\pi n}\mathrm{e}^{-\frac{1}{2} (2\pi \frac{n}{T})^2} \sin\left(2\pi \frac{n}{T\sigma} (t-\mu)\right) \right )
 \end{aligned}
 ```

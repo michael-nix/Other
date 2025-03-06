@@ -24,7 +24,7 @@ switch nargout
         ax = gca(fig);
         plot(ax, x, u, 'LineWidth', 1.5);
         grid on;
-        axis([min(x), max(x), -1.1, 1.1]);
+        axis([x(1), x(end), -1.1, 1.1]);
         legend('"sine"');
         title("Polynomial Sine Function Approximation");
         xlabel("input parameter (a.u.)");

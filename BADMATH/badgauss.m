@@ -1,5 +1,5 @@
 function [u, x, v] = badgauss(varargin)
-% @(x,n,s,T) 2/T*(1/2 + sum(exp(-s^2*((1:n).').^2/2*(2*pi/T)^2).*cos((1:n).'.*x*(2*pi/T)), 1))
+% @(x, n, s, T) 2/T*(1/2 + sum(exp(-s^2*((1:n).').^2/2*(2*pi/T)^2).*cos((1:n).'.*x*(2*pi/T))))
 
 switch nargin
     case 0
@@ -55,10 +55,10 @@ switch nargin
 end
 
 w = 2*pi*n/T;
-u = 2/T*(1/2 + sum(exp(-(s*w).^2/2).*cos(w.*x), 1));
+u = 2/T*(1/2 + sum(exp(-(s*w).^2/2).*cos(w.*x)));
 
 if nargout == 3
-    v = 2/T*(x/2 + sum(exp(-(s*w).^2/2).*sin(w.*x)./w, 1)) + 1/2;
+    v = 2/T*(x/2 + sum(exp(-(s*w).^2/2).*sin(w.*x)./w)) + 1/2;
 end
 
 switch nargout
@@ -67,7 +67,7 @@ switch nargout
         ax = gca(fig);
         plot(ax, x, u, 'LineWidth', 1.5);
         grid on;
-        axis([min(x), max(x), 0, max(u) * 1.1]);
+        axis([x(1), x(end), 0, max(u) * 1.1]);
         legend('"PDF"');
         title("Gaussian Probability Density Function Approximation");
         xlabel("input parameter (a.u.)");

@@ -1,5 +1,5 @@
 function v = badcdf(varargin)
-% function v = badcdf(x, n, s, T)
+% @(x, n, s, T) 2/T*(x/2 + sum(exp(-s^2*((1:n).').^2/2*(2*pi/T)^2).*sin((1:n).'.*x*(2*pi/T)) ./ ((1:n).'*(2*pi/T)))) + 1/2;
 
 switch nargin
     case 0
@@ -64,7 +64,7 @@ end
     % slower:
     % n = (1:n)';
     % w = 2*pi*n/T;
-    % v = 2/T*(x/2 + sum(exp(-(s*w).^2/2).*sin(w.*x)./w, 1)) + 1/2;
+    % v = 2/T*(x/2 + sum(exp(-(s*w).^2/2).*sin(w.*x)./w)) + 1/2;
 
     switch nargout
         case 0
@@ -72,7 +72,7 @@ end
             ax = gca(fig);
             plot(ax, x, v, 'LineWidth', 1.5);
             grid on;
-            axis([min(x), max(x), -0.1, 1.1]);
+            axis([x(1), x(end), -0.1, 1.1]);
             legend('"CDF"');
             title("Gaussian Cumulative Density Function Approximation");
             xlabel("input parameter (a.u.)");
