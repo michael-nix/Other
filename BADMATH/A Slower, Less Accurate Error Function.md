@@ -8,7 +8,7 @@ Doing probability theory is too easy, let's make it worse.
 The only thing I remember from engineering school is every single Fourier Transform pair.  As though etched into my bones, I can't actually do the math, only grasp around and guess at what ends up being something pretty close to the right answer.  I mean, skinny functions transform to wide ones, finite sharp functions become smooth and infinite, or like, squares go to sincs.  Convolution or multiplication of any one of these by another moves them around or reshapes them.  Ya know, the basics.  Which is how this came to me in a dream:
 
 ```matlab
-gx = @(x, n, s, T) 2/T * (0.5 + sum(exp(-(2*pi/T*s * (1:n).').^2/2) .* cos((1:n).' .* (2*pi/T * x)), 1))
+gx = @(x, n, s, T) 2/T * (0.5 + sum(exp(-(2*pi/T*s * (1:n).').^2/2) .* cos((1:n).' .* (2*pi/T * x))))
 ```
 
 It turns out that one of my hobbies is dreaming up terrible one line functions in MATLAB that mimic real math.  Or rather, make worse versions of built in math functions.  Slower, less accurate.  This one is a normalized Gaussian function made up from a sum of discrete Fourier series components.  Since Gaussians are generally symmetric about zero, $n$ is the number of cosines used to construct it, $s$ is $\sigma$, the standard deviation, and $T$ is the period of the series (since Fourier series repeat).  
@@ -146,11 +146,15 @@ Then all we have to do is choose a suitable period.  Say we want some kind of us
 T = 2k\,\sigma
 ```
 
-And in this way we make sure that we have $k$ standard deviations on either side of our function.
+And in this way we make sure that we have $k$ standard deviations on either side of our function.  Before we go any further, we can first make a few simplifcations: 1) realize that the cosine of zero is just one; and, 2) realize that cosines are even functions, so we double their value, but only count from $n=1$ to infinity, and correct for double-counting of the $n=0$ case:
 
 ```math
 f(t) \approx \frac{2}{T} \left (\frac{1}{2} + \sum_{n\,=\,1}^{n_\mathrm{max}} \mathrm{e}^{-\frac{1}{2} \sigma^2(2\pi \frac{n}{T})^2} \cos\left(2\pi \frac{n}{T} t\right) \right )
 ```
+
+This is where that first MATLAB one-liner comes from.
+
+
 
 ```math
 \Phi(t) = \int f(t) \; \mathrm{d}t \approx \frac{2}{T} \left (\frac{t}{2} + \sum_{n\,=\,1}^{n_\mathrm{max}} \frac{T}{2\pi n}\mathrm{e}^{-\frac{1}{2} \sigma^2(2\pi \frac{n}{T})^2} \sin\left(2\pi \frac{n}{T} t\right) \right ) + C
