@@ -20,7 +20,7 @@ u = sum(1i.^(n-1) ./ factorial(n) .* x.^n, 1);
 
 switch nargout
     case 0
-        fig = figure("OuterPosition", [200, 200, 800, 600]);
+        fig = figure("OuterPosition", [200, 200, 800, 500]);
         ax = gca(fig);
         plot(ax, x, u, 'LineWidth', 1.5);
         grid on;

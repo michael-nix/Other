@@ -54,29 +54,29 @@ switch nargin
         T = varargin{4};
 end
 
-    w = 2 * pi / T;
-    v = exp(-(s * w).^2 / 2) .* sin(w.*x) ./ (w);
-    for i = 2:n
-        v = v + exp(-(s * w * i).^2 / 2) .* sin(w * i .* x) ./ (w * i);
-    end
-    v = (v + x/2) * w / pi + 1/2;
+w = 2 * pi / T;
+v = exp(-(s * w).^2 / 2) .* sin(w.*x) ./ (w);
+for i = 2:n
+    v = v + exp(-(s * w * i).^2 / 2) .* sin(w * i .* x) ./ (w * i);
+end
+v = (v + x/2) * 2 / T + 1/2;
 
-    % slower:
-    % n = (1:n)';
-    % w = 2*pi*n/T;
-    % v = 2/T*(x/2 + sum(exp(-(s*w).^2/2).*sin(w.*x)./w)) + 1/2;
+% slower:
+% n = (1:n)';
+% w = 2*pi*n/T;
+% v = 2/T*(x/2 + sum(exp(-(s*w).^2/2).*sin(w.*x)./w)) + 1/2;
 
-    switch nargout
-        case 0
-            fig = figure("OuterPosition", [200, 200, 800, 600]);
-            ax = gca(fig);
-            plot(ax, x, v, 'LineWidth', 1.5);
-            grid on;
-            axis([x(1), x(end), -0.1, 1.1]);
-            legend('"CDF"');
-            title("Gaussian Cumulative Density Function Approximation");
-            xlabel("input parameter (a.u.)");
-            ylabel("probability");
-    
-            v = [];
-    end
+switch nargout
+    case 0
+        fig = figure("OuterPosition", [200, 200, 800, 500]);
+        ax = gca(fig);
+        plot(ax, x, v, 'LineWidth', 1.5);
+        grid on;
+        axis([x(1), x(end), -0.1, 1.1]);
+        legend('"CDF"');
+        title("Gaussian Cumulative Density Function Approximation");
+        xlabel("input parameter (a.u.)");
+        ylabel("probability");
+
+        v = [];
+end

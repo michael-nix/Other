@@ -154,14 +154,29 @@ f(t) \approx \frac{2}{T} \left (\frac{1}{2} + \sum_{n\,=\,1}^{n_\mathrm{max}} \m
 
 This is where that first MATLAB one-liner comes from.
 
-
+Now we're only a few steps away from our final goal: some kind of error function.  The nice thing about our current approximation is that it's incredibly linear.  That is, adding up a bunch of cosines is almost the definition of linear--not at all, but still.  However, this means that we can do one thing with this approximation that we can't really do with normal Gaussians: just integrate the fucker.  Yup, that's it, we just turn the cosines into sines and shuffle the arguments around together, and this gives us:
 
 ```math
 \Phi(t) = \int f(t) \; \mathrm{d}t \approx \frac{2}{T} \left (\frac{t}{2} + \sum_{n\,=\,1}^{n_\mathrm{max}} \frac{T}{2\pi n}\mathrm{e}^{-\frac{1}{2} \sigma^2(2\pi \frac{n}{T})^2} \sin\left(2\pi \frac{n}{T} t\right) \right ) + C
 ```
 
+But uh oh, that constant of integration has come to taunt us.  But thankfully cumulative distribution functions have really easy boundary conditions: at left infinity they're zero, and at right infinity they're one.  So we can just take a look at a graph of our function, and see where the ends end up.
+
+<p align="center">
+    <img src="./figures/cdf offset determination.png" width="75%"><br>
+    <i>Figure 2: Figuring Out Constants of Integration</i>
+</p>
+
+Ok, because we summed up a bunch of sines, it's no surprise that at $t=0$ our approximation is going to be zero, but our ends don't go to any value.  Because we integrated a periodic function, the cumulative distribution function doesn't level off at either end, but at left infinity it tends to bottom infinity, and at right infinity it tends to top infinity.  That's not great.  But, in this graph we obviously didn't do what we said we were going to do earlier: we didn't truncate the domain of the function so that it's well defined in our region of interest.  So, if we squint and look at, say, $\pm$ 5, we can tell that our constant of integration is obviously $\frac{1}{2}$.  So that leaves us with a final form for our Gaussian CDF approximation, which we will call `badcdf` in this folder:
+
 ```math
 \Phi(t) \approx \frac{2}{T} \left (\frac{t}{2} + \sum_{n\,=\,1}^{n_\mathrm{max}} \frac{T}{2\pi n}\mathrm{e}^{-\frac{1}{2} \sigma^2(2\pi \frac{n}{T})^2} \sin\left(2\pi \frac{n}{T} t\right) \right ) + \frac{1}{2}
+```
+
+Or as a MATLAB one-liner:
+
+```matlab
+@(x, n, s, T) 2/T * (x/2 + sum(exp(-s^2 * ((1:n).').^2/2 * (2*pi/T)^2) .* sin((1:n).' .* x * (2*pi/T)) ./ ((1:n).' * (2*pi/T)))) + 1/2;
 ```
 
 <!-- ```math
@@ -184,7 +199,7 @@ f(t - \mu) &= \frac{1}{2\pi} \int_{-\infty}^\infty \mathrm{e}^{-\frac{1}{2} \sig
 
 <p align="center">
     <img src="./figures/cdf comparison.png" width="75%"><br>
-    <i>Figure 2: Comparison of Gaussian CDF and Approximation</i>
+    <i>Figure 3: Comparison of Gaussian CDF and Approximation</i>
 </p>
 
 ```math
