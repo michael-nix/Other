@@ -11,11 +11,11 @@ The only thing I remember from engineering school is every single Fourier Transf
 gx = @(x, n, s, T) 2/T * (0.5 + sum(exp(-(2*pi/T*s * (1:n).').^2/2) .* cos((1:n).' .* (2*pi/T * x))))
 ```
 
-It turns out that one of my hobbies is dreaming up terrible one line functions in MATLAB that mimic real math.  Or rather, make worse versions of built in math functions.  Slower, less accurate.  This one is a normalized Gaussian function made up from a sum of discrete Fourier series components.  Since Gaussians are generally symmetric about zero, $n$ is the number of cosines used to construct it, $s$ is $\sigma$, the standard deviation, and $T$ is the period of the series (since Fourier series repeat).  
+It turns out that one of my hobbies is dreaming up terrible one line functions in MATLAB that mimic real math.  Or rather, make worse versions of built in math functions.  Slower, less accurate.  This one is a normalized Gaussian function made up from a sum of discrete Fourier series components.  Since Gaussians are generally symmetric about zero, $n$ is the number of cosines used to construct it, $s$ is $\sigma$, the standard deviation, and $T$ is the period of the series (since Fourier series repeat).  This one I put into its own file, `badgauss`, somewhere in the same folder as this file. 
 
-Other than the deepest recesses of my mind, where in the hell did this come from?
+Other than the deepest recesses of my mind, where in the hell did this come from?  And, can we use it as the basis for building up another terrible approximation of, say, and error function?
 
-When you look up, "how to do a Fourier transform for a Gaussian," on the internet, the first thing you see is the Wolfram MathWorld answer which boils down to, "it's just a cosine transfer because sines are odd, and then you look it up in Abramowitz and Stegun."  This is not a satisfying answer.  There are some standard derivations out there, working through the actual math nicely, but they're boring and I found them hard to follow.  Which is why it took me so long to type this up.  But then I found a good one posted online by Konstantinos Derpanis at York University.  Here it is:
+When you look up, "how to do a Fourier transform for a Gaussian," on the internet, the first thing you see is the Wolfram MathWorld answer which boils down to, "it's just a cosine transform because sines are odd, and then you look it up in Abramowitz and Stegun."  This is not a satisfying answer.  There are some standard derivations out there, working through the actual math nicely, but they're boring and I found them hard to follow.  Which is why it took me so long to type this up.  But then I found a good one posted online by Konstantinos Derpanis at York University.  Here it is:
 
 First, we're going to use this definition of the Fourier transform,
 
@@ -26,14 +26,14 @@ F(\omega) = \int_{-\infty}^\infty f(t) \, \mathrm{e}^{-j\omega t} \mathrm{d} t
 Then, starting with the definition of a normalized Gaussian,
 
 ```math
-f(t) = \frac{1}{\sqrt{2\pi\sigma^2}} \mathrm{e}^{-x^2/2\sigma^2}
+f(t) = \frac{1}{\sqrt{2\pi\sigma^2}} \mathrm{e}^{-t^2/2\sigma^2}
 ```
 
 We take the derivative of both sides,
 
 ```math
 \begin{aligned}
-\frac{\mathrm{d}}{\mathrm{d}t} f(t) &= -\frac{x}{\sigma^2} \frac{1}{\sqrt{2\pi\sigma^2}} \mathrm{e}^{-x^2/2\sigma^2} \\
+\frac{\mathrm{d}}{\mathrm{d}t} f(t) &= -\frac{t}{\sigma^2} \frac{1}{\sqrt{2\pi\sigma^2}} \mathrm{e}^{-t^2/2\sigma^2} \\
 &= -\frac{t}{\sigma^2} f(t)
 \end{aligned}
 ```
@@ -41,10 +41,7 @@ We take the derivative of both sides,
 Which is always fun, since we always get the original Gaussian back (this is where Hermite polynomials come from).  We then take the Fourier transform of both sides,
 
 ```math
-\begin{aligned}
-j\omega F(\omega) &= -\frac{t}{\sigma^2} F(\omega) \\
-&= -\frac{j}{\sigma^2} \frac{\mathrm{d}}{\mathrm{d}\omega} F(\omega)
-\end{aligned}
+j\omega F(\omega) = -\frac{j}{\sigma^2} \frac{\mathrm{d}}{\mathrm{d}\omega} F(\omega)
 ```
 
 And re-arrange so that all of our Fourier transformed parts are on the left-hand side,
@@ -101,7 +98,7 @@ And since $\mathrm{e}$ raised to the power of the logarithm of some value is jus
 \boxed{\therefore \; F(\omega) = \mathrm{e}^{-\frac{1}{2}\sigma^2\omega^2}}
 ```
 
-Which is pretty clever!  The hardest integration we had to do was to remember that the integral of a special function was one, nice.  But we're only halfway there, this is the Fourier transform of a Gaussian, but how do we use this to construct Gaussians from cosines?  
+Which is pretty clever!  The hardest integration we had to do was to remember that the integral of a special function was one, nice.  But we're only halfway there, this is the Fourier transform of a Gaussian, but how do we use this to construct Gaussians from cosines?  What about that pesky error function?
 
 The first step is to use the definition of the inverse transform, realize that sines are again odd functions, and then convert from angular frequency to regular frequency.  This gets us,
 
@@ -128,7 +125,7 @@ Which looks like this, when dealing with $\mathcal{N}(0, 0.25)$:
 
 And I hope you notice that--much like every Fourier series transform--this is a periodic approximation.  That is, the Gaussian we have here is repeated for every interval, $T$.
 
-But this isn't what we set out to do.  We wanted to create a bad version of a perfectly well approximated function, the error function.  In order to get us closer to our true goal, we have to do two things:
+But this isn't what we set out to do.  We wanted to create a bad version of a perfectly well approximated function, the error function.  In order to get us closer to our true goal, we have to do a few things:
 
 1. Correct it so that it's no longer periodic,
 2. Integrate it to get a cumulative distribution function,
@@ -160,7 +157,7 @@ Now we're only a few steps away from our final goal: some kind of error function
 \Phi(t) = \int f(t) \; \mathrm{d}t \approx \frac{2}{T} \left (\frac{t}{2} + \sum_{n\,=\,1}^{n_\mathrm{max}} \frac{T}{2\pi n}\mathrm{e}^{-\frac{1}{2} \sigma^2(2\pi \frac{n}{T})^2} \sin\left(2\pi \frac{n}{T} t\right) \right ) + C
 ```
 
-But uh oh, that constant of integration has come to taunt us.  But thankfully cumulative distribution functions have really easy boundary conditions: at left infinity they're zero, and at right infinity they're one.  So we can just take a look at a graph of our function, and see where the ends end up.
+But uh oh, that constant of integration has come to taunt us.  Thankfully cumulative distribution functions have really easy boundary conditions: at left infinity they're zero, and at right infinity they're one.  So we can just take a look at a graph of our function, and see where the ends end up.
 
 <p align="center">
     <img src="./figures/cdf offset determination.png" width="75%"><br>
@@ -181,7 +178,7 @@ Or as a MATLAB one-liner:
 
 Where `x` is our input parameter, `n` is the number of sines to use, `s` is the standard deviation, and `T` is the period.
 
-One of the interesting things about the error function is that it's usually given in terms of some kind of location and scale parameter (like a mean and standard deviation), not as separate inputs to the function, but as direct modifications to your input.  This means, that if we set our previous standard deviation parameter, $\sigma$ to one, we can reframe everything similar, meaning our cumulative distribution function then becomes:
+One of the interesting things about the error function is that it's usually given in terms of some kind of location and scale parameter (like a mean and standard deviation), not as separate inputs to the function, but as direct modifications to your input.  This means, that if we set our previous standard deviation parameter, $\sigma$, to one, meaning our cumulative distribution function then becomes:
 
 ```math
 \Phi \left ( \frac{t-\mu}{\sigma} \right ) \approx \frac{2}{T} \left (\frac{t-\mu}{2\sigma} + \sum_{n\,=\,1}^{n_\mathrm{max}} \frac{T}{2\pi n}\mathrm{e}^{-\frac{1}{2} (2\pi \frac{n}{T})^2} \sin\left(2\pi \frac{n}{T\sigma} (t-\mu)\right) \right ) + \frac{1}{2}
@@ -200,7 +197,7 @@ And then plot them to get some indication that they're approximately the same:
     <i>Figure 3: Comparison of Gaussian CDF and Approximation</i>
 </p>
 
-As you can see, just directly scaling and relocating the input parameter for both functions gets what you'd expect for a Gaussian CDF with a mean of 1, and standard deviation of half.
+As you can see, just directly scaling and relocating the input parameter for both functions gets what you'd expect for a Gaussian CDF with a mean of 1, and standard deviation of one half.
 
 Convinced that we're on the right track, we can now finally do what we've set out to do: define our slower, less accurate error function, included as `baderf` somewhere in the folder that this document is placed:
 
@@ -231,7 +228,7 @@ And comparing the two error functions, using ten sines in our approximation with
     <i>Figure 4: Comparing erf and Its Approximation</i>
 </p>
 
-But is this slower? Is it less accurate?  The one liner is most definitely always going to be slower, as it requires a whole bunch of memory be allocated and then worked through, so depending on the total number of sines you want to use, and the size of the input (e.g. if it's super large to test how fast it is), you can spend way too much time dealing with memory.  Or, you can loop through each sine instead; which, while not a convenient one-liner, seems to perform better.  Though, since the error function is typically approximated using a few polynomials as opposed to however each sine function is calculated, we can assume this approach will definitely be slower.
+But is this slower? Is it less accurate?  The one liner is most definitely always going to be slower, as it requires a whole bunch of memory to be allocated and then worked through, so depending on the total number of sines you want to use, and the size of the input (e.g. if it's super large to test how fast it is), you can spend way too much time dealing with memory.  Or, you can loop through each sine instead; which, while not a convenient one-liner, seems to perform better.  Since the error function is typically approximated using a few polynomials as opposed to however each sine function is calculated, we can assume this approach will definitely be slower.
 
 But how much?  Let's find out:
 
@@ -253,7 +250,7 @@ ans =
 >>  
 ```
 
-Almost five times slower, that's not so bad!  We can, of course, speed that up by using fewer sines at the expense of accuracy, but we can never quite get as fast as the built in `erf`.  Oh well.  What about accuracy?  Well, the built in functions are pretty good with respect to that, but we can run some quick checks, say, a standard deviation out to see how various levels of approximation work out:
+Almost five times slower, that's not so bad!  We can, of course, speed that up by using fewer sines at the expense of accuracy, but we can never quite get as fast as the built in `erf`.  Oh well.  What about accuracy?  Well, the built in functions are pretty good with respect to that, adjusting their approximations depending on how close to $\pm 1$ you want to be, but we can run some quick checks, say, a standard deviation out to see how various levels of our approximation work out:
 
 ```matlab
 >> for i = 1:10, err(i) = baderf(1, i, 10) - erf(1), end
