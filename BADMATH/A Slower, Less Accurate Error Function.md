@@ -179,6 +179,82 @@ Or as a MATLAB one-liner:
 @(x, n, s, T) 2/T * (x/2 + sum(exp(-s^2 * ((1:n).').^2/2 * (2*pi/T)^2) .* sin((1:n).' .* x * (2*pi/T)) ./ ((1:n).' * (2*pi/T)))) + 1/2;
 ```
 
+Where `x` is our input parameter, `n` is the number of sines to use, `s` is the standard deviation, and `T` is the period.
+
+One of the interesting things about the error function is that it's usually given in terms of some kind of location and scale parameter (like a mean and standard deviation), not as separate inputs to the function, but as direct modifications to your input.  This means, that if we set our previous standard deviation parameter, $\sigma$ to one, we can reframe everything similar, meaning our cumulative distribution function then becomes:
+
+```math
+\Phi \left ( \frac{t-\mu}{\sigma} \right ) \approx \frac{2}{T} \left (\frac{t-\mu}{2\sigma} + \sum_{n\,=\,1}^{n_\mathrm{max}} \frac{T}{2\pi n}\mathrm{e}^{-\frac{1}{2} (2\pi \frac{n}{T})^2} \sin\left(2\pi \frac{n}{T\sigma} (t-\mu)\right) \right ) + \frac{1}{2}
+```
+
+Now, this wouldn't work with our previous Gaussian apprxoimation, as if we set $\sigma$ to one, then the normalization gets all messed up.  But when we integrated it, the shuffling around of parameters actually took care of that for us.  This now means that we can directly compare our CDF approximation with the definition of a Gaussian CDF using the error function:
+
+```math
+\Phi \left ( \frac{t-\mu}{\sigma} \right ) = \frac{1}{2} \left [1 + \mathrm{erf} \left ( \frac{t-\mu}{\sigma \sqrt{2}} \right ) \right ]
+```
+
+And then plot them to get some indication that they're approximately the same:
+
+<p align="center">
+    <img src="./figures/cdf comparison.png" width="75%"><br>
+    <i>Figure 3: Comparison of Gaussian CDF and Approximation</i>
+</p>
+
+As you can see, just directly scaling and relocating the input parameter for both functions gets what you'd expect for a Gaussian CDF with a mean of 1, and standard deviation of half.
+
+Convinced that we're on the right track, we can now finally do what we've set out to do: define our slower, less accurate error function, included as `baderf` somewhere in the folder that this document is placed:
+
+<!-- ```math
+\begin{aligned}
+\mathrm{erf} \left ( \frac{t-\mu}{\sigma \sqrt{2}} \right ) &= 2 \Phi \left ( \frac{t-\mu}{\sigma} \right ) - 1 \\
+&\approx \frac{4}{T} \left (\frac{t-\mu}{2\sigma} + \sum_{n\,=\,1}^{n_\mathrm{max}} \frac{T}{2\pi n}\mathrm{e}^{-\frac{1}{2} (2\pi \frac{n}{T})^2} \sin\left(2\pi \frac{n}{T\sigma} (t-\mu)\right) \right )
+\end{aligned}
+``` -->
+
+```math
+\begin{aligned}
+\mathrm{erf}  ( t ) &= 2 \Phi \left ( t\sqrt{2} \right ) - 1 \\
+&\approx \frac{4}{T} \left (\frac{t\sqrt{2}}{2} + \sum_{n\,=\,1}^{n_\mathrm{max}} \frac{T}{2\pi n}\mathrm{e}^{-\frac{1}{2} (2\pi \frac{n}{T})^2} \sin\left(2\pi \frac{n}{T} (t\sqrt{2})\right) \right )
+\end{aligned}
+```
+
+Or as a MATLAB one-liner:
+
+```matlab
+@(x, n, s, T) 4/T * (x*sqrt(2)/2 + sum(exp(-s^2 * ((1:n).').^2/2 * (2*pi/T)^2) .* sin((1:n).' .* x * sqrt(2) * (2*pi/T)) ./ ((1:n).' * (2*pi/T))));
+```
+
+And comparing the two error functions, using ten sines in our approximation with a period of 10:
+
+<p align="center">
+    <img src="./figures/erf approx.png" width="75%"><br>
+    <i>Figure 4: Comparing erf and Its Approximation</i>
+</p>
+
+But is this slower? Is it less accurate?  The one liner is most definitely always going to be slower, as it requires a whole bunch of memory be allocated and then worked through, so depending on the total number of sines you want to use, and the size of the input (e.g. if it's super large to test how fast it is), you can spend way too much time dealing with memory.  Or, you can loop through each sine instead; which, while not a convenient one-liner, seems to perform better.  Though, since the error function is typically approximated using a few polynomials as opposed to however each sine function is calculated, we can assume this approach will definitely be slower.
+
+But how much?  Let's find out:
+
+```matlab
+>> x = linspace(-10, 10, 2^20);
+
+>> tic; for i = 1:100, u = erf((x - 1) / 2); end, toc;
+Elapsed time is 0.344611 seconds.
+
+>> tic; for i = 1:100, u = baderf((x - 1) / 2, 10, 10); end, toc;
+Elapsed time is 1.672149 seconds.
+
+>> 1.672149 / 0.344611
+
+ans =
+
+    4.8523
+
+>>  
+```
+
+
+
 <!-- ```math
 \begin{aligned}
 f(t - \mu) &= \frac{1}{2\pi} \int_{-\infty}^\infty \mathrm{e}^{-\frac{1}{2} \sigma^2\omega^2} \mathrm{e}^{-j\omega \mu} \mathrm{e}^{j\omega t} \; \mathrm{d}\omega \\
@@ -188,23 +264,3 @@ f(t - \mu) &= \frac{1}{2\pi} \int_{-\infty}^\infty \mathrm{e}^{-\frac{1}{2} \sig
 &= \int_{-\infty}^\infty \mathrm{e}^{-\frac{1}{2} \sigma^2(2\pi f)^2} \cos(2\pi f (t-\mu)) \; \mathrm{d}f
 \end{aligned}
 ``` -->
-
-```math
-\Phi \left ( \frac{t-\mu}{\sigma} \right ) \approx \frac{2}{T} \left (\frac{t-\mu}{2\sigma} + \sum_{n\,=\,1}^{n_\mathrm{max}} \frac{T}{2\pi n}\mathrm{e}^{-\frac{1}{2} (2\pi \frac{n}{T})^2} \sin\left(2\pi \frac{n}{T\sigma} (t-\mu)\right) \right ) + \frac{1}{2}
-```
-
-```math
-\Phi \left ( \frac{t-\mu}{\sigma} \right ) = \frac{1}{2} \left [1 + \mathrm{erf} \left ( \frac{t-\mu}{\sigma \sqrt{2}} \right ) \right ]
-```
-
-<p align="center">
-    <img src="./figures/cdf comparison.png" width="75%"><br>
-    <i>Figure 3: Comparison of Gaussian CDF and Approximation</i>
-</p>
-
-```math
-\begin{aligned}
-\mathrm{erf} \left ( \frac{t-\mu}{\sigma \sqrt{2}} \right ) &= 2 \Phi \left ( \frac{t-\mu}{\sigma} \right ) - 1 \\
-&\approx \frac{4}{T} \left (\frac{t-\mu}{2\sigma} + \sum_{n\,=\,1}^{n_\mathrm{max}} \frac{T}{2\pi n}\mathrm{e}^{-\frac{1}{2} (2\pi \frac{n}{T})^2} \sin\left(2\pi \frac{n}{T\sigma} (t-\mu)\right) \right )
-\end{aligned}
-```
