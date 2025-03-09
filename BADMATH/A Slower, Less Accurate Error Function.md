@@ -253,7 +253,57 @@ ans =
 >>  
 ```
 
+Almost five times slower, that's not so bad!  We can, of course, speed that up by using fewer sines at the expense of accuracy, but we can never quite get as fast as the built in `erf`.  Oh well.  What about accuracy?  Well, the built in functions are pretty good with respect to that, but we can run some quick checks, say, a standard deviation out to see how various levels of approximation work out:
 
+```matlab
+>> for i = 1:10, err(i) = baderf(1, i, 10) - erf(1), end
+>> err = table((1:10).', err.', 'VariableNames', ["nmax", "error"])
+
+err =
+
+  10x2 table
+
+    nmax            error        
+    ____    _____________________
+
+      1        -0.154243549125533
+      2       -0.0127841678455513
+      3       0.00366666368192969
+      4      0.000953672091459468
+      5       7.1027478101171e-05
+      6      1.62817545112937e-07
+      7      -1.9881938284616e-07
+      8      -8.0543699487734e-09
+      9     -8.65575389141782e-11
+     10      8.62643290133747e-13
+```
+
+Which, if you want to be able to quickly choose your accuracy, isn't so bad.  Assuming that the MATLAB built in error function is perfectly accurate at one standard deviation, and you only need six digits of accuracy, you can cut your run time down to only, like, three times slower if you choose six sines to use in your approximation instead of ten.  Of course, changing the period of the approximation also plays a big role.  After all, if you spread the function out, you'll probably have a worse accuracy for a given number of summed sines.  For example:
+
+```matlab
+>> for i = 1:10, err(i) = baderf(1, 10, i*4) - erf(1), end
+>> err = table((4:4:40).', err.', 'VariableNames', ["T", "error"])
+
+err =
+
+  10x2 table
+
+    T             error        
+    __    _____________________
+
+     4      0.00971564930514868
+     8     4.52483606139253e-11
+    12    -3.54251405987327e-09
+    16     4.92961805265146e-07
+    20     0.000186347314430124
+    24      0.00131448958765756
+    28      0.00294086686587258
+    32      0.00269042300725186
+    36     -0.00166862221701158
+    40      -0.0109954993238769
+```
+
+Which is kind of fun.  Accuracy starts out really poor for a given number of summed sines at one standard deviation as adjacent periods of the function smoosh up against each other, but then as things stretch out again accuracy improves, but then quickly starts to deteriorate.  So yeah, we have multiple levers we can pull in order to adjust accuracy... yay...
 
 <!-- ```math
 \begin{aligned}

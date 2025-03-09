@@ -2,15 +2,15 @@ function v = baderf(varargin)
 
 switch nargin
     case 0
-        % [u, x] = badgauss
+        % v = baderf
         n = 10;
         x = -2*pi:0.01:2*pi;
         T = 10;
         
     case 1
-        % [u, x] = badgauss(n)
+        % v = baderf(n)
         if length(varargin{1}) > 1
-            error('badgauss:InvalidInput','With one input, it must be the number of harmonics to use, n.');
+            error('baderf:InvalidInput','With one input, it must be the number of harmonics to use, n.');
         end
         
         n = varargin{1};
@@ -18,21 +18,21 @@ switch nargin
         T = 10;
         
     case 2
-        % [u, x] = badgauss(x, n)
+        % v = baderf(x, n)
         x = varargin{1};
         
         if length(varargin{2}) > 1
-            error('badgauss:InvalidInput','Input variable n is the number of harmonics and must be a single integer.');
+            error('baderf:InvalidInput','Input variable n is the number of harmonics and must be a single integer.');
         end
         n = varargin{2};
         T = 10;
                 
     case 3
-        % [u, x] = badgauss(x, n, T)
+        % v = baderf(x, n, T)
         x = varargin{1};
         
         if length(varargin{2}) > 1 || length(varargin{3}) > 1
-            error('badgauss:InvalidInput','Other than x, input variables must be single numbers.');
+            error('baderf:InvalidInput','Other than x, input variables must be single numbers.');
         end
         n = varargin{2};
         T = varargin{3};
