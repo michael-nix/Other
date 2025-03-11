@@ -22,16 +22,16 @@ function v = badcdf(varargin)
 
 switch nargin
     case 0
-        % [u, x] = badgauss
+        % [u, x] = badcdf
         n = 10;
         x = -2*pi:0.01:2*pi;
         s = 0.5;
         T = 2 * 5 * s;
         
     case 1
-        % [u, x] = badgauss(n)
+        % [u, x] = badcdf(n)
         if length(varargin{1}) > 1
-            error('badgauss:InvalidInput','With one input, it must be the number of harmonics to use, n.');
+            error('badcdf:InvalidInput','With one input, it must be the number of harmonics to use, n.');
         end
         
         n = varargin{1};
@@ -40,33 +40,33 @@ switch nargin
         T = 2 * 5 * s;
         
     case 2
-        % [u, x] = badgauss(x, n)
+        % [u, x] = badcdf(x, n)
         x = varargin{1};
         
         if length(varargin{2}) > 1
-            error('badgauss:InvalidInput','Input variable n is the number of harmonics and must be a single integer.');
+            error('badcdf:InvalidInput','Input variable n is the number of harmonics and must be a single integer.');
         end
         n = varargin{2};
         s = 0.5;
         T = 2 * 5 * s;
         
     case 3
-        % [u, x] = badgauss(x, n, s)
+        % [u, x] = badcdf(x, n, s)
         x = varargin{1};
         
         if length(varargin{2}) > 1 || length(varargin{3}) > 1
-            error('badgauss:InvalidInput','Other than x, input variables must be single numbers.');
+            error('badcdf:InvalidInput','Other than x, input variables must be single numbers.');
         end
         n = varargin{2};
         s = varargin{3};
         T = 2 * 5 * s;
         
     case 4
-        % [u, x] = badgauss(x, n, s, T)
+        % [u, x] = badcdf(x, n, s, T)
         x = varargin{1};
         
         if length(varargin{2}) > 1 || length(varargin{3}) > 1 || length(varargin{4}) > 1 
-            error('badgauss:InvalidInput','Other than x, input variables must be single numbers.');
+            error('badcdf:InvalidInput','Other than x, input variables must be single numbers.');
         end
         n = varargin{2};
         s = varargin{3};
