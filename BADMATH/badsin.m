@@ -1,6 +1,18 @@
 function [u, x] = badsin(varargin)
-% @(x,n) sum(1i.^((0:2:n-1)')./factorial((1:2:n)').*x.^((1:2:n)'),1);
-
+%BADSIN   @(x, n) sum(1i.^((0:2:n-1)')./factorial((1:2:n)').*x.^((1:2:n)'));
+%
+%   [u, x] = BADSIN() without input arguments returns a default sine approximation,
+%   u, along with the inputs that were used to generate it.
+%
+%   BADSIN(...) without output arguments returns nothing, but plots the approximation.
+%
+%   [u, x] = BADSIN(n) generates an n-level approximation with default inputs, returning
+%   the approximation, u, and the inputs used to generate it, x.
+%
+%   [u, x] = BADSIN(x, n) generates an n-level approximation with given inputs, x,
+%   returning the approximation, u, and the inputs used to generate it, x.
+%
+%   See also: BADCOS, BADGAUSS, BADCDF, BADERF
 if nargin > 1 && length(varargin) < 3
     x = varargin{1};
     n = varargin{2};

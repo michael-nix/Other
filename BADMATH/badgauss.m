@@ -1,6 +1,24 @@
 function [u, x, v] = badgauss(varargin)
 % @(x, n, s, T) 2/T*(1/2 + sum(exp(-s^2*((1:n).').^2/2*(2*pi/T)^2).*cos((1:n).'.*x*(2*pi/T))))
-
+%
+%   u = BADGAUSS() without input arguments returns a default Gaussian probability density
+%   function approximation, u.
+%
+%   BADGAUSS(...) without output arguments returns nothing, but plots the approximation.
+%
+%   u = BADGAUSS(n) generates an n-level approximation with default inputs, returning
+%   the approximation, u.
+%
+%   u = BADGAUSS(x, n) generates an n-level approximation with given inputs, x,
+%   returning the approximation, u.
+%
+%   u = BADGAUSS(x, n, s) generates an n-level approximation with given inputs, x,
+%   and standard deviation, s, returning the approximation, u.
+%
+%   u = BADGAUSS(x, n, s, T) generates an n-level approximation with given inputs, x,
+%   standard deviation, s, period, T, returning the approximation, u.
+%
+%   See also: BADCOS, BADSIN, BADCDF, BADERF
 switch nargin
     case 0
         % [u, x] = badgauss

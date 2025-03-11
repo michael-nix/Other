@@ -1,5 +1,24 @@
 function v = badcdf(varargin)
 % @(x, n, s, T) 2/T*(x/2 + sum(exp(-s^2*((1:n).').^2/2*(2*pi/T)^2).*sin((1:n).'.*x*(2*pi/T)) ./ ((1:n).'*(2*pi/T)))) + 1/2;
+%
+%   v = BADCDF() without input arguments returns a default Gaussian cumulative distribution
+%   function approximation, v.
+%
+%   BADCDF(...) without output arguments returns nothing, but plots the approximation.
+%
+%   v = BADCDF(n) generates an n-level approximation with default inputs, returning
+%   the approximation, v.
+%
+%   v = BADCDF(x, n) generates an n-level approximation with given inputs, x,
+%   returning the approximation, v.
+%
+%   v = BADCDF(x, n, s) generates an n-level approximation with given inputs, x,
+%   and standard deviation, s, returning the approximation, v.
+%
+%   v = BADCDF(x, n, s, T) generates an n-level approximation with given inputs, x,
+%   standard deviation, s, period, T, returning the approximation, v.
+%
+%   See also: BADCOS, BADSIN, BADGAUSS, BADERF
 
 switch nargin
     case 0

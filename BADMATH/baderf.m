@@ -1,5 +1,21 @@
 function v = baderf(varargin)
-
+%BADERF   @(x, n, T) 4/T * (x*sqrt(2)/2 + sum(exp(-s^2 * ((1:n).').^2/2 * (2*pi/T)^2) .* sin((1:n).' .* x * sqrt(2) * (2*pi/T)) ./ ((1:n).' * (2*pi/T))));
+%
+%   v = BADERF() without input arguments returns a default error function 
+%   approximation, v.
+%
+%   BADERF(...) without output arguments returns nothing, but plots the approximation.
+%
+%   v = BADERF(n) generates an n-level approximation with default inputs, returning
+%   the approximation, v.
+%
+%   v = BADERF(x, n) generates an n-level approximation with given inputs, x, 
+%   returning the approximation, v.
+%
+%   v = BADERF(x, n, T) generates an n-level approximation with given inputs, x,
+%   and period, T, returning the approximation, v.
+%
+%   See also: BADCOS, BADSIN, BADGAUSS, BADCDF 
 switch nargin
     case 0
         % v = baderf

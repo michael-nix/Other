@@ -1,5 +1,18 @@
 function [u, x] = badcos(varargin)
-% @(x,n) sum(1i.^((0:2:n).')./factorial((0:2:n).').*x.^((0:2:n).'),1);
+%BADCOS   @(x, n) sum(1i.^((0:2:n).')./factorial((0:2:n).').*x.^((0:2:n).'));
+%
+%   [u, x] = BADCOS() without input arguments returns a default cosine approximation,
+%   u, along with the inputs that were used to generate it.
+%
+%   BADCOS(...) without output arguments returns nothing, but plots the approximation.
+%
+%   [u, x] = BADCOS(n) generates an n-level approximation with default inputs, returning
+%   the approximation, u, and the inputs used to generate it, x.
+%
+%   [u, x] = BADCOS(x, n) generates an n-level approximation with given inputs, x,
+%   returning the approximation, u, and the inputs used to generate it, x.
+%
+%   See also: BADSIN, BADGAUSS, BADCDF, BADERF
 
 if nargin > 1 && length(varargin) < 3
     x = varargin{1};
