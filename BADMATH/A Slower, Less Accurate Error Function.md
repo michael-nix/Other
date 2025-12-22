@@ -13,7 +13,7 @@ gx = @(x, n, s, T) 2/T * (0.5 + sum(exp(-(2*pi/T*s * (1:n).').^2/2) .* cos((1:n)
 
 It turns out that one of my hobbies is dreaming up terrible one line functions in MATLAB that mimic real math.  Or rather, make worse versions of built in math functions.  Slower, less accurate.  This one is a normalized Gaussian function made up from a sum of discrete Fourier series components.  Since Gaussians are generally symmetric about zero, $n$ is the number of cosines used to construct it, $s$ is $\sigma$, the standard deviation, and $T$ is the period of the series (since Fourier series repeat).  This one I put into its own file, `badgauss`, somewhere in the same folder as this file. 
 
-Other than the deepest recesses of my mind, where in the hell did this come from?  And, can we use it as the basis for building up another terrible approximation of, say, and error function?
+Other than the deepest recesses of my mind, where in the hell did this come from?  And, can we use it as the basis for building up another terrible approximation of, say, an error function?
 
 When you look up, "how to do a Fourier transform for a Gaussian," on the internet, the first thing you see is the Wolfram MathWorld answer which boils down to, "it's just a cosine transform because sines are odd, and then you look it up in Abramowitz and Stegun."  This is not a satisfying answer.  There are some standard derivations out there, working through the actual math nicely, but they're boring and I found them hard to follow.  Which is why it took me so long to type this up.  But then I found a good one posted online by Konstantinos Derpanis at York University.  Here it is:
 
@@ -38,7 +38,7 @@ We take the derivative of both sides,
 \end{aligned}
 ```
 
-Which is always fun, since we always get the original Gaussian back (this is where Hermite polynomials come from).  We then take the Fourier transform of both sides,
+Which is always fun, since we get the original Gaussian back (this is where Hermite polynomials come from).  We then take the Fourier transform of both sides,
 
 ```math
 j\omega F(\omega) = -\frac{j}{\sigma^2} \frac{\mathrm{d}}{\mathrm{d}\omega} F(\omega)
@@ -131,19 +131,19 @@ But this isn't what we set out to do.  We wanted to create a bad version of a pe
 2. Integrate it to get a cumulative distribution function,
 3. Translate that to an error function.
 
-The first thing we have to do is get rid of that periodicity.  Which is very easy when using a computer: just ignore it!  That is, if we limit the domain of our function to be within $\pm T / 2$, where $T$ is the period of our approximation, i.e.:
+The first thing we have to do is get rid of that periodicity.  Which is very easy when using a computer: just ignore it!  That is, we limit the domain of our function to be within $\pm T / 2$, where $T$ is the period of our approximation, i.e.:
 
 ```math
 -\frac{T}{2} \le t \le \frac{T}{2}
 ```
 
-Then all we have to do is choose a suitable period.  Say we want some kind of use for this out to five standard deviations, then all we have to do in order to make sure we get both sides of the function working, is to double it:
+Then all we have to do is choose a suitable period.  Say we want some kind of use for this out to *k* standard deviations, then all we have to do in order to make sure we get both sides of the function working, is to double it:
 
 ```math
 T = 2k\,\sigma
 ```
 
-And in this way we make sure that we have $k$ standard deviations on either side of our function.  Before we go any further, we can first make a few simplifcations: 1) realize that the cosine of zero is just one; and, 2) realize that cosines are even functions, so we double their value, but only count from $n=1$ to infinity, and correct for double-counting of the $n=0$ case:
+And in this way we make sure that we have $k$ standard deviations on either side of our function.  Before we go any further, we can first make a few simplifcations: 1) realize that the cosine of zero is just one; and, 2) realize that cosines are even functions.  So we double their value, but only count from $n=1$ to infinity, and correct for double-counting of the $n=0$ case:
 
 ```math
 f(t) \approx \frac{2}{T} \left (\frac{1}{2} + \sum_{n\,=\,1}^{n_\mathrm{max}} \mathrm{e}^{-\frac{1}{2} \sigma^2(2\pi \frac{n}{T})^2} \cos\left(2\pi \frac{n}{T} t\right) \right )
@@ -151,7 +151,7 @@ f(t) \approx \frac{2}{T} \left (\frac{1}{2} + \sum_{n\,=\,1}^{n_\mathrm{max}} \m
 
 This is where that first MATLAB one-liner comes from.
 
-Now we're only a few steps away from our final goal: some kind of error function.  The nice thing about our current approximation is that it's incredibly linear.  That is, adding up a bunch of cosines is almost the definition of linear--not at all, but still.  However, this means that we can do one thing with this approximation that we can't really do with normal Gaussians: just integrate the fucker.  Yup, that's it, we just turn the cosines into sines and shuffle the arguments around together, and this gives us:
+Now we're only a few steps away from our final goal: some kind of error function.  The nice thing about our current approximation is that it's incredibly linear.  That is, adding up a bunch of cosines is almost the definition of linear.  Not at all, but still.  However, this means that we can do one thing with this approximation that we can't really do with normal Gaussians: just integrate the fucker.  Yup, that's it, we just turn the cosines into sines and shuffle the arguments around together, and this gives us:
 
 ```math
 \Phi(t) = \int f(t) \; \mathrm{d}t \approx \frac{2}{T} \left (\frac{t}{2} + \sum_{n\,=\,1}^{n_\mathrm{max}} \frac{T}{2\pi n}\mathrm{e}^{-\frac{1}{2} \sigma^2(2\pi \frac{n}{T})^2} \sin\left(2\pi \frac{n}{T} t\right) \right ) + C
@@ -178,7 +178,7 @@ Or as a MATLAB one-liner:
 
 Where `x` is our input parameter, `n` is the number of sines to use, `s` is the standard deviation, and `T` is the period.
 
-One of the interesting things about the error function is that it's usually given in terms of some kind of location and scale parameter (like a mean and standard deviation), not as separate inputs to the function, but as direct modifications to your input.  This means, that if we set our previous standard deviation parameter, $\sigma$, to one, meaning our cumulative distribution function then becomes:
+One of the interesting things about the error function is that it's usually given in terms of some kind of location and scale parameter (like a mean and standard deviation), not as separate inputs to the function, but as direct modifications to your input.  This means, that if we set our previous standard deviation parameter, $\sigma$, to one, our cumulative distribution function then becomes:
 
 ```math
 \Phi \left ( \frac{t-\mu}{\sigma} \right ) \approx \frac{2}{T} \left (\frac{t-\mu}{2\sigma} + \sum_{n\,=\,1}^{n_\mathrm{max}} \frac{T}{2\pi n}\mathrm{e}^{-\frac{1}{2} (2\pi \frac{n}{T})^2} \sin\left(2\pi \frac{n}{T\sigma} (t-\mu)\right) \right ) + \frac{1}{2}
@@ -300,7 +300,9 @@ err =
     40      -0.0109954993238769
 ```
 
-Which is kind of fun.  Accuracy starts out really poor for a given number of summed sines at one standard deviation as adjacent periods of the function smoosh up against each other, but then as things stretch out again accuracy improves, but then quickly starts to deteriorate.  So yeah, we have multiple levers we can pull in order to adjust accuracy... yay...
+Which is kind of fun.  Accuracy starts out really poor for a given number of summed sines at one standard deviation as adjacent periods of the function smoosh up against each other, but then as things stretch out again accuracy improves, but then quickly starts to deteriorate.  So yeah, we have multiple levers we can pull in order to adjust accuracy.
+
+And that's it: a slower, less accurate error function; mission accomplished.  Have a great day everyone.
 
 <!-- ```math
 \begin{aligned}
